@@ -12,25 +12,25 @@ This analysis examines polling data from FiveThirtyEight's 2024 Presidential Ele
 ## Repository Structure
 
 - `data/`:
-    - 01-raw_data/          # Original FiveThirtyEight polling data
-    - 02-analysis_data/     # Cleaned and processed datasets
+  `01-raw_data/`          # Original FiveThirtyEight polling data
+  `02-analysis_data/`     # Cleaned and processed datasets
 - `models/`:
-    - multinom_model.rds    # Saved model files
+  `multinom_model.rds`    # Saved model files
 - `outputs/`:
-    - figures/              # Generated plots and visualizations
-    - model_performance.rds # Model validation results
+  `figures/`            # Generated plots and visualizations
+  `model_performance.rds` # Model validation results
 - `paper/`:
-    - paper.qmd            # Main Quarto document
-    - paper.pdf            # Compiled paper
-    - references.bib       # Bibliography
+  `paper.qmd`            # Main Quarto document
+  `paper.pdf`            # Compiled paper
+  `references.bib`       # Bibliography
 - `scripts/`
-    - 00-simulate_data.R
-    - 01-test_simulated_data.R
-    - 02-download_data.R
-    - 03-clean_data.R
-    - 04-test_analysis_data.R
-    - 05-exploratory_data_analysis.R
-    - 06-model_data.R
+  `00-simulate_data.R`
+  `01-test_simulated_data.R`
+  `02-download_data.R`
+  `03-clean_data.R`
+  `04-test_analysis_data.R`
+  `05-exploratory_data_analysis.R`
+  `06-model_data.R`
 
 ## LLM Usage Statement
 This project utilized ChatGPT 4.0 for the following purposes:
@@ -56,7 +56,6 @@ Complete chat logs are available in `usage.txt`.
 
 ## Reproducibility
 ### Prerequisites
-
 - R (version 4.2.3 or higher)
 - RStudio (recommended for easy project management)
 - Git (for cloning repository)
@@ -65,32 +64,32 @@ Complete chat logs are available in `usage.txt`.
 
 ### Repository Setup
 To reproduce this analysis:
-1. Clone this repository
-   
-3. Create necessary directories if they don't exist
-- data/01-raw_data
-- data/02-analysis_data
-- outputs/figures
-- models
+**1. Clone this repository   
 
-3. Install Required R Packages
+**2. Create necessary directories if they don't exist
+- `data/01-raw_data`
+- `data/02-analysis_data`
+- `outputs/figures`
+- `models`
+
+**3. Install Required R Packages
 Run this in R or RStudio
-- tidyverse     # For data manipulation and visualization
-- nnet          # For multinomial logistic regression
-- caret         # For model training and validation
-- arrow         # For parquet file handling
-- ggplot2       # For plotting
-- knitr         # For document generation
-- modelsummary  # For model results tables
-- lubridate     # For date handling
+- `tidyverse`    # For data manipulation and visualization
+- `nnet`          # For multinomial logistic regression
+- `caret`         # For model training and validation
+- `arrow`         # For parquet file handling
+- `ggplot2`       # For plotting
+- `knitr`         # For document generation
+- `modelsummary`  # For model results tables
+- `lubridate`     # For date handling
 
-4. Data Preparation
+**4. Data Preparation
 - Download the polling data from FiveThirtyEight:
 - Visit: `https://projects.fivethirtyeight.com/polls/president-general/2024/`
 - Click `Download the data`
 - Save the CSV file to `data/01-raw_data/president_polls.csv`
 
-5. Run Analysis Scripts
+**5. Run Analysis Scripts
 Execute the following R scripts in order in R or RStudio
 - `scripts/00-simulate_data.R`              # Generate simulated data
 - `scripts/01-test_simulated_data.R`        # Validate simulated data
@@ -112,19 +111,19 @@ After successful execution, you should see:
 
 ### Troubleshooting
 Common issues and solutions:
-1. Package Installation Errors
-- If you encounter package installation issues, try:
-    - install.packages("pak")
-    - pak::pkg_install(c("tidyverse", "nnet", "caret"))
+**1. Package Installation Errors
+If you encounter package installation issues, try:
+- `install.packages("pak")`
+- `pak::pkg_install(c("tidyverse", "nnet", "caret"))`
 
-2. Data Loading Issues
-- Verify data path using:
-    - list.files("data/01-raw_data")
+**2. Data Loading Issues
+Verify data path using:
+- `list.files("data/01-raw_data")`
 
-3. File Path Errors
-- Use the here package to verify the project structure:
-    - library(here)
-    - here::dr_here()
+**3. File Path Errors
+Use the `here` package to verify the project structure:
+- `library(here)`
+- `here::dr_here()`
 
 ### To confirm successful reproduction:
 - Check model performance metrics in `outputs/model_performance.rds`
@@ -136,12 +135,3 @@ Common issues and solutions:
 - Running time: ~10-15 minutes on standard hardware
 - Required memory: ~4GB RAM
 - For issues or questions, please open a GitHub issue
-
-## Citation
-@misc{election2024forecast,
-  author = {Grace Nguyen},
-  title = {Forecasting the 2024 US Presidential Election},
-  year = {2024},
-  publisher = {GitHub},
-  url = {https://github.com/gracenguyen133/2024-U.S.-Election-Forecast.git}
-}
