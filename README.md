@@ -64,6 +64,7 @@ Complete chat logs are available in `usage.txt`.
 
 ### Repository Setup
 To reproduce this analysis:
+
 **1. Clone this repository**   
 
 **2. Create necessary directories if they don't exist**
@@ -73,6 +74,7 @@ To reproduce this analysis:
 - `models`
 
 **3. Install Required R Packages**
+
 Run this in R or RStudio
 - `tidyverse`    # For data manipulation and visualization
 - `nnet`          # For multinomial logistic regression
@@ -84,12 +86,14 @@ Run this in R or RStudio
 - `lubridate`     # For date handling
 
 **4. Data Preparation**
+
 - Download the polling data from `FiveThirtyEight`
 - Visit `https://projects.fivethirtyeight.com/polls/president-general/2024/`
 - Click `Download the data`
 - Save the CSV file to `data/01-raw_data/president_polls.csv`
 
 **5. Run Analysis Scripts**
+
 Execute the following R scripts in order in R or RStudio
 - `scripts/00-simulate_data.R`              # Generate simulated data
 - `scripts/01-test_simulated_data.R`        # Validate simulated data
@@ -100,6 +104,7 @@ Execute the following R scripts in order in R or RStudio
 - `scripts/06-model_data.R`                 # Fit prediction models
 
 **6. Generate Paper**
+
 In terminal or command prompt: `quarto render paper/paper.qmd`
 
 ### Expected Outputs
@@ -111,16 +116,20 @@ After successful execution, you should see:
 
 ### Troubleshooting
 Common issues and solutions:
+
 **1. Package Installation Errors**
+
 If you encounter package installation issues, try:
 - `install.packages("pak")`
 - `pak::pkg_install(c("tidyverse", "nnet", "caret"))`
 
 **2. Data Loading Issues**
+
 Verify data path using:
 - `list.files("data/01-raw_data")`
 
 **3. File Path Errors**
+
 Use the `here` package to verify the project structure:
 - `library(here)`
 - `here::dr_here()`
