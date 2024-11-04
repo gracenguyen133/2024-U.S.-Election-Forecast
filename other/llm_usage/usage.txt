@@ -1,0 +1,206 @@
+LLM: ChatGPT-4.
+Date: 23 October 2024
+
+
+User: Help me with forecasting the 2024 US presidential election using polling data analysis
+ChatGPT: I'll help you build a comprehensive analysis framework. Let's start with the project setup and initial data simulation:
+
+# 00-simulate_data.R
+# Script to simulate polling data for candidates
+library(here)
+
+# Create necessary directories
+dir.create(here::here("data", "01-raw_data"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here::here("data", "02-analysis_data"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here::here("outputs", "figures"), recursive = TRUE, showWarnings = FALSE)
+dir.create(here::here("models"), recursive = TRUE, showWarnings = FALSE)
+
+set.seed(123)  # For reproducibility
+
+# Parameters for simulation
+num_polls <- 1000
+candidates <- c("Joe Biden", "Donald Trump", "Kamala Harris")
+
+# Simulate polling data
+polls_data <- data.frame(
+  poll_id = 1:num_polls,
+  candidate_name = sample(candidates, num_polls, replace = TRUE),
+  pct = runif(num_polls, 30, 50),
+  sample_size = sample(300:1500, num_polls, replace = TRUE),
+  state = sample(state.abb, num_polls, replace = TRUE)
+)
+
+# Save simulated data
+write.csv(polls_data, 
+          here::here("data", "02-analysis_data", "simulated_polls_data.csv"), 
+          row.names = FALSE)
+
+
+User: Can you help with testing the simulated data?
+ChatGPT: Here's a comprehensive testing script for the simulated data:
+# 01-test_simulated_data.R
+# Script to test simulated polling data
+library(here)
+library(dplyr)
+
+# Load the simulated data
+simulated_data <- read.csv(
+  here::here("data", "02-analysis_data", "simulated_polls_data.csv")
+)
+
+# Test conditions
+missing_values <- sum(is.na(simulated_data))
+if (missing_values > 0) {
+  stop("Data contains missing values!")
+}
+
+# Check percentages range
+if (any(simulated_data$pct < 30 | simulated_data$pct > 50)) {
+  stop("Polling percentages out of range!")
+}
+
+# Validate candidate names
+valid_candidates <- c("Joe Biden", "Donald Trump", "Kamala Harris")
+if (any(!simulated_data$candidate_name %in% valid_candidates)) {
+  stop("Invalid candidate names found in the data!")
+}
+
+summary(simulated_data)
+
+User: Can you help with the data loading and cleaning process?
+ChatGPT: Here's a detailed data processing pipeline:
+# 05-exploratory_data_analysis.R
+# Script for exploratory data analysis on the cleaned polling data
+# Load necessary libraries
+library(here)
+library(ggplot2)
+library(dplyr)
+
+# Load the cleaned data
+file_path <- here::here("data", "02-analysis_data", "cleaned_polls_data.csv")
+cleaned_data <- read_csv(file_path)
+
+# Define major candidates for filtering (example: Biden, Trump, Harris)
+major_candidates <- c("Joe Biden", "Donald Trump", "Kamala Harris")
+
+# Filter the data to include only major candidates
+filtered_data <- cleaned_data %>% filter(candidate_name %in% major_candidates)
+
+# Plot the polling percentage for major candidates over time
+ggplot(filtered_data, aes(x = end_date, y = pct, color = candidate_name)) +
+  geom_smooth(se = FALSE, size = 1.2) +
+  labs(title = "Average Polling Percentage Over Time for Major Candidates",
+       x = "End Date of Poll",
+       y = "Polling Percentage",
+       color = "Candidate") +
+  scale_color_manual(values = c("Joe Biden" = "blue", 
+                                "Donald Trump" = "red", 
+                                "Kamala Harris" = "purple")) +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+# Save the improved plot
+ggsave(here::here("outputs", "figures", "average_polling_over_time_improved.png"), 
+       width = 10, height = 6)
+
+# Improved Plot for Polling Percentages by State
+# Filter the data to include only major candidates and exclude national polls
+state_data <- cleaned_data %>%
+  filter(candidate_name %in% major_candidates & state != "National")
+
+# Plot polling percentages by state for major candidates
+ggplot(state_data, aes(x = reorder(state, pct, FUN = median), y = pct, fill = candidate_name)) +
+  geom_boxplot(outlier.size = 0.5, alpha = 0.7) +
+  labs(title = "Polling Percentages by State for Major Candidates",
+       x = "State",
+       y = "Polling Percentage",
+       fill = "Candidate") +
+  scale_fill_manual(values = c("Joe Biden" = "blue", 
+                               "Donald Trump" = "red", 
+                               "Kamala Harris" = "purple")) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+        legend.position = "top") +
+  coord_cartesian(clip = "off")
+
+# Save the improved plot
+ggsave(here::here("outputs", "figures", "polling_by_state_improved_size.png"), 
+       width = 16, height = 8)
+
+# Count the number of polls conducted by each pollster
+pollster_counts <- cleaned_data %>%
+  group_by(pollster) %>%
+  summarise(num_polls = n()) %>%
+  arrange(desc(num_polls))
+
+# Filter to show only the top 20 pollsters with the most polls
+top_pollsters <- pollster_counts %>% 
+  top_n(20, num_polls)
+
+# Plot the number of polls by the top 20 pollsters
+ggplot(top_pollsters, aes(x = reorder(pollster, num_polls), y = num_polls)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Number of Polls Conducted by Top 20 Pollsters for Major Candidates",
+       x = "Pollster",
+       y = "Number of Polls") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.y = element_text(size = 12),
+        plot.title = element_text(hjust = 0.5))
+
+# Save the improved plot
+ggsave(here::here("outputs", "figures", "polls_by_top_pollsters_improved.png"), 
+       width = 12, height = 8)
+
+User: Can you help with the multinomial logistic regression model for this case?
+ChatGPT: Here's a multinomial logistic regression model script:
+# 06-model_data.R
+# Load necessary libraries
+library(here)
+library(dplyr)
+library(nnet)  # For multinomial logistic regression
+library(caret)
+
+# Load the cleaned data
+file_path <- here::here("data", "02-analysis_data", "cleaned_polls_data.csv")
+cleaned_data <- read_csv(file_path)
+
+# Filter data for major candidates
+model_data <- cleaned_data %>%
+  filter(candidate_name %in% c("Joe Biden", "Donald Trump", "Kamala Harris")) %>%
+  select(candidate_name, pct, sample_size, state, methodology, party) %>%
+  na.omit()
+
+# Convert categorical variables to factors
+model_data <- model_data %>%
+  mutate(state = as.factor(state),
+         methodology = as.factor(methodology),
+         party = as.factor(party),
+         candidate_name = as.factor(candidate_name))  # Multinomial outcome
+
+# Split data into training and testing sets (70-30 split)
+set.seed(123)
+trainIndex <- createDataPartition(model_data$candidate_name, p = 0.7, list = FALSE, times = 1)
+training_set <- model_data[trainIndex, ]
+testing_set <- model_data[-trainIndex, ]
+
+# Train the multinomial logistic regression model
+set.seed(123)
+multinom_model <- multinom(candidate_name ~ pct + sample_size + state + methodology + party, data = training_set)
+
+# Display the model summary
+summary(multinom_model)
+
+# Predict on the testing set
+testing_set$predicted_class <- predict(multinom_model, newdata = testing_set)
+
+# Evaluate the model performance
+confusion_matrix <- confusionMatrix(as.factor(testing_set$predicted_class), as.factor(testing_set$candidate_name))
+
+# Print the confusion matrix and accuracy
+print(confusion_matrix)
+
+# Save the fitted model to a file in the models directory
+model_file_path <- here::here("models", "multinom_model.rds")
+saveRDS(multinom_model, file = model_file_path)
+
